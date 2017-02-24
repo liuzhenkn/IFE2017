@@ -76,7 +76,7 @@
     menuElement.addEventListener("contextmenu",(e) => {
       //取消默认右键事件
       window.event.returnValue=false;
-      e.cancelBubble = true; //阻止事件冒泡
+      e.stopPropagation(); //阻止事件冒泡
       return false;
     });
 
