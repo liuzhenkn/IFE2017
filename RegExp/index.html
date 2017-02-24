@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>正则表达式之入门</title>
+  <style>
+  </style>
+</head>
+<body>
+  <input id="telNum"‘’ type="text" placeholder="输入电话">
+  <span></span>
+  <input id="checkTelNum" type="button" value="电话验证">
+  <br>
+  <input id="inputStr" type="text" placeholder="字符串">
+  <span></span>
+  <input id="checkStr" type="button" value="单词查重">
+</body>
+<script>
+  let telEle = document.getElementById("telNum");
+  let strEle = document.getElementById("inputStr");
+  let telBtn = document.getElementById("checkTelNum");
+  let strBtn = document.getElementById("checkStr");
+  const TELREGEX = /^1[34578]\d{9}$/;
+  const STRREGEX = /\b(\w+)\b\s+\1/; //\b(\w+)\b匹配一个单词 \s+匹配空格 \1表示向后匹配第一个分组的单词
+
+  telBtn.addEventListener("click",() => {
+    if(TELREGEX.test(telEle.value)){
+      alert("正确");
+    }else{
+      alert("不是有效的电话号码");
+    }
+  });
+
+  strBtn.addEventListener("click",() => {
+    if(STRREGEX.test(strEle.value)){
+      alert("存在相邻重复单词");
+    }else{
+      alert("不存在相邻重复单词")
+    }
+  });
+</script>
+</html>
