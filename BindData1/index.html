@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>动态数据绑定(一)</title>
+</head>
+<body>
+
+</body>
+<script>
+
+  function Observer(data){
+    this.data = data;
+    this.travel(data);
+  }
+
+  let prototype = Observer.prototype;
+
+  prototype.travel = function(object){
+    let value;
+    for(let key in object){
+      //只遍历绑定在对象上的属性
+      if(object.hasOwnProperty(key)){
+        value = object[key];
+        if(typeof value === 'object'){
+          new Observer(value);
+        }
+        this.convert(key,value);//给每个属性添加相应的getter setter方法
+      }
+    }
+  }
+
+
+  prototype.convert = function (key, value) {
+      /*Object.defineProperty(obj, prop, descriptor) 将属性添加到对象，或修改现有属性的特性。
+        descriptor 要求传入一个对象，其默认值如下，
+          {
+            configurable: false,
+            enumerable: false,
+            writable: false,
+            value: null,
+            set: undefined,
+            get: undefined
+          }
+          参数不一一列举，可以到https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty  查看api
+      */
+      Object.defineProperty(this.data, key, {
+          enumerable: true,
+          configurable: true,
+          get: function(){
+              console.log('你访问了' + key);
+              return value;
+          },
+          set: function(newValue){
+              console.log('你设置了' + key);
+              console.log('新的' + key + ' = ' + newValue);
+              if (newValue === value){
+                return;
+              }
+              val = newVal;
+          }
+      })
+  };
+</script>
+</html>
