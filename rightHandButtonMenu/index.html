@@ -71,6 +71,7 @@
     });
 
     menuElement.addEventListener("click",(e) => {
+      alert(e.target.innerText);
       e.cancelBubble = true; //阻止事件冒泡
     });
     menuElement.addEventListener("contextmenu",(e) => {
