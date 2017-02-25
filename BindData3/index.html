@@ -11,9 +11,12 @@
 </body>
 <script>
 
-  function Observer(data,callback){
+  function Observer(data,parent,parentKey){
     this.data = data;
     this.watch = {};
+    //传递参数，确定父级及其key
+    this.parent = parent;
+    this.parentKey = parentKey;
     this.travel(data);
   }
 
@@ -30,10 +33,8 @@
       if(object.hasOwnProperty(key)){
         value = object[key];
         if(typeof value === 'object'){
-          this.$watch(key, function(){ // 设置统一监听事件
-            console.log("hhhh");
-          });
-          new Observer(value);
+          //有父级则传递相应参数
+          new Observer(value,this,key);
         }
         this.convert(key,value);//给每个属性添加相应的getter setter方法
       }
@@ -41,7 +42,7 @@
   }
 
 
-  prototype.convert = function (key, value) {
+  prototype.convert = function(key, value){
       /*Object.defineProperty(obj, prop, descriptor) 将属性添加到对象，或修改现有属性的特性。
         descriptor 要求传入一个对象，其默认值如下，
           {
@@ -67,14 +68,13 @@
               return value;
           },
           set: function(newValue){
-              if(typeof newValue === 'object'){
-                that.watch[key]();
-                new Observer(newValue);
+              if(parent != null){
+                that.parent.watch[that.parentKey](newValue) // 父类监听事件
               }
-              if (newValue === value){
+              that.watch[key](newValue) // 回调监听 取代下面那条语句
+              if(newValue === value){
                 return;
               }
-              that.watch[key](newValue);
               value = newValue;
           }
       })
@@ -91,6 +91,10 @@
   app2.$watch('name', function (newName) {
     console.log('我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。')
   });
+
+  // app2.$watch('lastName', function (newName) {
+  //   console.log('我的名字发生了变化。')
+  // });
 
   app2.data.name.firstName = 'hahaha';
   // 输出：我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。
