@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <title>动态数据绑定(一)</title>
+  <title>动态数据绑定(二)</title>
 </head>
 <body>
 
@@ -13,10 +13,15 @@
 
   function Observer(data){
     this.data = data;
+    this.watch = {};
     this.travel(data);
   }
 
   let prototype = Observer.prototype;
+
+  prototype.$watch = function (key, callback) {
+    this.watch[key] = callback;
+  }
 
   prototype.travel = function(object){
     let value;
@@ -46,6 +51,11 @@
           }
           参数不一一列举，可以到https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty  查看api
       */
+      this.$watch(key, function(newValue){ // 设置统一监听事件
+        console.log(`你设置了 ${key}, 新的值为${newValue}`);
+      });
+
+      var that = this;
       Object.defineProperty(this.data, key, {
           enumerable: true,
           configurable: true,
@@ -54,14 +64,27 @@
               return value;
           },
           set: function(newValue){
-              console.log('你设置了' + key);
-              console.log('新的' + key + ' = ' + newValue);
+              if(typeof newValue === 'object'){
+                new Observer(newValue);
+              }
               if (newValue === value){
                 return;
               }
+              that.watch[key](newValue);
               value = newValue;
           }
       })
   };
+  //实现要求例子
+  let app1 = new Observer({
+      name: 'youngwind',
+      age: 25
+  });
+  //重写监听触发的回调事件，从而可以自定义事件
+  app1.$watch('age', function(age) {
+          console.log(`我的年纪变了，现在已经是：${age}岁了`)
+  });
+
+  app1.data.age = 100; // 输出：'我的年纪变了，现在已经是100岁了'
 </script>
 </html>
