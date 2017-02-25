@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>动态数据绑定(三)</title>
+</head>
+<body>
+
+</body>
+<script>
+
+  function Observer(data,callback){
+    this.data = data;
+    this.watch = {};
+    this.travel(data);
+  }
+
+  let prototype = Observer.prototype;
+
+  prototype.$watch = function (key, callback) {
+    this.watch[key] = callback;
+  }
+
+  prototype.travel = function(object){
+    let value;
+    for(let key in object){
+      //只遍历绑定在对象上的属性
+      if(object.hasOwnProperty(key)){
+        value = object[key];
+        if(typeof value === 'object'){
+          this.$watch(key, function(){ // 设置统一监听事件
+            console.log("hhhh");
+          });
+          new Observer(value);
+        }
+        this.convert(key,value);//给每个属性添加相应的getter setter方法
+      }
+    }
+  }
+
+
+  prototype.convert = function (key, value) {
+      /*Object.defineProperty(obj, prop, descriptor) 将属性添加到对象，或修改现有属性的特性。
+        descriptor 要求传入一个对象，其默认值如下，
+          {
+            configurable: false,
+            enumerable: false,
+            writable: false,
+            value: null,
+            set: undefined,
+            get: undefined
+          }
+          参数不一一列举，可以到https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/defineProperty  查看api
+      */
+      this.$watch(key, function(newValue){ // 设置统一监听事件
+        console.log(`你设置了 ${key}, 新的值为${newValue}`);
+      });
+
+      var that = this;
+      Object.defineProperty(this.data, key, {
+          enumerable: true,
+          configurable: true,
+          get: function(){
+              console.log(`你访问了${key}`);
+              return value;
+          },
+          set: function(newValue){
+              if(typeof newValue === 'object'){
+                that.watch[key]();
+                new Observer(newValue);
+              }
+              if (newValue === value){
+                return;
+              }
+              that.watch[key](newValue);
+              value = newValue;
+          }
+      })
+  };
+  //实现要求例子
+  let app2 = new Observer({
+      name: {
+          firstName: 'shaofeng',
+          lastName: 'liang'
+      },
+      age: 25
+  });
+
+  app2.$watch('name', function (newName) {
+    console.log('我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。')
+  });
+
+  app2.data.name.firstName = 'hahaha';
+  // 输出：我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。
+  app2.data.name.lastName = {
+    a: "hh",
+    b: "gg"
+  };
+  // 输出：我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。
+</script>
+</html>
