@@ -68,7 +68,7 @@
               return value;
           },
           set: function(newValue){
-              if(parent != null){
+              if(that.parent){
                 that.parent.watch[that.parentKey](newValue) // 父类监听事件
               }
               that.watch[key](newValue) // 回调监听 取代下面那条语句
@@ -92,9 +92,9 @@
     console.log('我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。')
   });
 
-  // app2.$watch('lastName', function (newName) {
-  //   console.log('我的名字发生了变化。')
-  // });
+  app2.$watch('age', function(age) {
+          console.log(`我的年纪变了，现在已经是：${age}岁了`)
+  });
 
   app2.data.name.firstName = 'hahaha';
   // 输出：我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。
@@ -103,5 +103,6 @@
     b: "gg"
   };
   // 输出：我的姓名发生了变化，可能是姓氏变了，也可能是名字变了。
+  app2.data.age = 100;
 </script>
 </html>
